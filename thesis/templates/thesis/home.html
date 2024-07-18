@@ -1,0 +1,37 @@
+{% extends 'thesis/base.html' %}
+{% load static %}
+{% block body %}
+
+
+    <div style="
+        min-height: 100vh;
+        width: 100%;
+        background-image: url({% static 'thesis/pul-bg.jpg' %});
+        background-size: cover;
+        display: flex;
+        align-items: center;
+        position: relative;
+    ">
+        <div class="options-container">
+            <a class="option absolute-right" href="/docgen/students/"><span class="glyphicon glyphicon-plus"></span> Student</a>
+            <a class="option absolute-left" href="/docgen/"><span class="glyphicon glyphicon-home"></span> Home</a>
+            <div class="options">
+                <a class="option" href="/docgen/proposal_entries/">Proposal</a>
+                <a class="option" href="/docgen/midterm_entries/">Mid-Term</a>
+                <a class="option" href="/docgen/final_entries/">Final</a>
+            </div>
+        </div>
+
+        <!-- <img src="{% static 'thesis/home.jpg' %}" alt="Trulli" style="display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;"> -->
+
+    </div>
+
+
+
+
+
+
+{% endblock %}

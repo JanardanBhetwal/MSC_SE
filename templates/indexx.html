@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WELCOME</title>
+    <!-- Adding a version parameter to the stylesheet link for cache busting -->
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to MSC Workflow Website</h1>
+        <p class="header-description">
+          Welcome to the MSc Workflow and Document Management System, developed for the Institute of Engineering, Pulchowk Campus, specifically catering to the Department of Electronics and Computer Engineering.
+        </p>
+        <nav>
+            <ul>
+                <li><a href="/admin">ADMIN PAGE</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <p><!-- Main content goes here --></p>
+        
+          <img src="{% static 'ioeimg.jpg' %}" alt="Centered Image" class="centered-image">
+      
+      
+    </main>
+    <footer>
+        <p>© 2024 MSC Website</p>
+    </footer>
+</body>
+</html>
+
+

@@ -1,0 +1,142 @@
+/* styles.css */
+
+/* Root variables for easy color and spacing management */
+:root {
+    --primary-color: #0066cc; /* Bright blue background */
+    --secondary-color: #004999; /* Slightly darker blue for buttons */
+    --hover-color: #003366; /* Even darker blue for hover state */
+    --background-color: #f0f0f0; /* Light grey background */
+    --text-color: #333; /* Main text color */
+    --white: #fff; /* White color */
+    --shadow-color: rgba(0, 0, 0, 0.1); /* Shadow color */
+}
+
+/* Global styles */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header styling */
+header {
+    background-color: var(--primary-color);
+    color: var(--white);
+    text-align: center;
+    padding: 2.5em 0 1.5em; /* Padding adjusted for better spacing */
+    box-shadow: 0 4px 8px var(--shadow-color);
+    position: relative;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.header-description {
+    margin: 0.6em 0 0.875em; /* Using em for consistent spacing */
+    font-size: 1.2em;
+    color: var(--white);
+    font-weight: 300;
+}
+
+/* Navigation styling within header */
+header nav {
+    position: absolute;
+    top: 55px; /* Adjusted to move the ADMIN link higher */
+    right: 120px;
+}
+
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex; /* Flexbox for better layout management */
+    gap: 1em; /* Gap between items */
+}
+
+header nav ul li {
+    display: inline-block;
+}
+
+header nav ul li a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.625em 1.25em; /* Padding adjusted for consistency */
+    background-color: var(--secondary-color);
+    border-radius: 5px; /* Rounded corners for buttons */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.centered-image {
+    width: 100%;              /* Make image fill the full width of main */
+    height: 100%;             /* Make image fill the full height of main */
+    object-fit: cover;        /* Ensure the image covers the area while maintaining aspect ratio */
+    border-radius: 8px;       /* Match border radius of the main container */
+}
+
+header nav ul li a:hover,
+header nav ul li a:focus { /* Adding focus for accessibility */
+    background-color: var(--hover-color);
+    transform: translateY(-3px);
+}
+
+main {
+    padding: 0;               /* Remove padding to allow image to cover full area */
+    flex: 1;                  /* Allow main to grow and fill available space */
+    background-color: var(--white); /* Maintain white background for main */
+    margin: 1.25em;           /* Margin to create space around the main content */
+    box-shadow: 0 4px 8px var(--shadow-color); /* Box shadow for depth */
+    border-radius: 8px;       /* Rounded corners for the main container */
+    display: flex;            /* Use flexbox to position content */
+    align-items: center;      /* Center content vertically */
+    justify-content: center;  /* Center content horizontally */
+    overflow: hidden;         /* Hide any overflow from the image */
+}
+
+
+/* Footer styling */
+footer {
+    background-color: var(--secondary-color); /* Consistent with navigation hover color */
+    color: var(--white);
+    text-align: center;
+    padding: 0.9375em 0; /* Using em for padding consistency */
+    box-shadow: 0 -4px 8px var(--shadow-color);
+    width: 100%;
+    margin-top: auto; /* Ensure footer stays at bottom if content is short */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 2em;
+    }
+
+    .header-description {
+        font-size: 1em;
+    }
+
+    header nav ul {
+        flex-direction: column; /* Stack items vertically */
+        align-items: center;
+    }
+
+    header nav ul li {
+        display: block;
+        margin: 0.625em 0; /* Consistent spacing with padding */
+    }
+
+    main {
+        margin: 0.625em;
+    }
+}
