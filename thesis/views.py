@@ -1,7 +1,12 @@
 
 import pandas as pd
 
+from django.shortcuts import render
+from django.conf import settings
+from django.http import Http404
+
 from django.shortcuts import render, redirect
+from django.core.files.storage import default_storage
 
 from . import utils
 import os
@@ -12,46 +17,20 @@ from django.http import HttpResponse
 import uuid
 from django.contrib import messages
 from django.http import JsonResponse
+from .utils import render_to_word
+import pypandoc
 
 def health_check(request):
     return JsonResponse({"status": "ok"})
 
-
 def index(request):
     return render(request, 'thesis/home.html')
-
 
 def invalid(request):
     return render(request, 'thesis/invalid.html')
 
-
-# def budget(request):
-#     if request.method == 'POST':
-#         formset = BudgetFormset(request.POST)
-#         print(formset.errors)
-#         if formset.is_valid():
-#             formset.save()
-#
-#         return redirect('budget')
-#     else:
-#         formset = BudgetFormset(queryset=Budget.objects.all())
-#         return render(request, 'thesis/budget.html', {'formset': formset})
-
-#
-# def admin(request):
-#     if request.method == 'POST':
-#         formset = AdministratorForm(request.POST)
-#         print(formset.errors)
-#         if formset.is_valid():
-#             formset.save()
-#         return redirect('index')
-#     else:
-#         formset = AdministratorForm(queryset=Admin.objects.all())
-#         return render(request, 'thesis/admin_setting.html', {'formset': formset})
-
-
-def proposal_entries(request):
-    return render(request, 'thesis/proposal_entries.html')
+# def proposal_entries(request):
+#     return render(request, 'thesis/proposal_entries.html')
 
 
 def midterm_entries(request):
@@ -60,7 +39,6 @@ def midterm_entries(request):
 
 def final_entries(request):
     return render(request, 'thesis/final_entries.html')
-
 
 def students(request):
     if request.method == 'POST':
@@ -91,58 +69,120 @@ def students(request):
     else:
         formset = StudentFormset(queryset=Student.objects.all())
         return render(request, 'thesis/students.html', {'formset': formset})
+    
 
 
-# def supervisor(request):
-#     if request.method == 'POST':
-#         formset = SupervisorForm(request.POST)
-#         print(formset.errors)
-#         if formset.is_valid():
-#             instances = formset.save(commit=False)
-#             for i in instances:
-#                 if i.remove is True:
-#                     i.delete()
-#                 else:
-#                     i.save()
-#         return redirect('supervisor')
-#     else:
-#         formset = SupervisorForm(queryset=Supervisor.objects.all())
-#         return render(request, 'thesis/supervisor.html', {'formset': formset})
 
+def list_proposal_files(request):
+    proposal_dir = os.path.join(settings.BASE_DIR, 'Documents', 'Proposal')
 
-# def examiner(request):
-#     if request.method == 'POST':
-#         formset = ExaminerForm(request.POST)
-#         print(formset.errors)
-#         if formset.is_valid():
-#             instances = formset.save(commit=False)
-#             for i in instances:
-#                 if i.remove is True:
-#                     i.delete()
-#                 else:
-#                     i.save()
-#             return redirect('examiner')
-#         else:
-#             return redirect('invalid')
-#     else:
-#         formset = ExaminerForm(queryset=Examiner.objects.all())
-#         return render(request, 'thesis/examiner.html', {'formset': formset})
+    try:
+        # Verify if the directory exists and list files
+        if os.path.exists(proposal_dir):
+            files = [f for f in os.listdir(proposal_dir) if os.path.isfile(os.path.join(proposal_dir, f))]
+        else:
+            files = []
+        
+    except Exception as e:
+        files = []
+
+    context = {
+        'files': files,
+    }
+    return render(request, 'thesis/proposal_entries.html', context)
+
+def serve_proposal_file(request, filename):
+    proposal_dir = os.path.join(settings.BASE_DIR, 'Documents', 'Proposal')
+    file_path = os.path.join(proposal_dir, filename)
+    
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+            response['Content-Disposition'] = f'attachment; filename={filename}'
+            return response
+    else:
+        raise Http404("File does not exist")
+    
+
+import os
+import uuid
+from django.conf import settings
+from django.http import HttpResponse, Http404
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Coordinator, CommonFields
+from .forms import NoticeForm, NoticeFormExtra
+from .utils import render_to_word
+
+def list_midterm_files(request):
+    midterm_dir = os.path.join(settings.BASE_DIR, 'Documents', 'Midterm')
+    try:
+        if os.path.exists(midterm_dir):
+            files = [f for f in os.listdir(midterm_dir) if os.path.isfile(os.path.join(midterm_dir, f))]
+        else:
+            files = []
+    except Exception as e:
+        files = []
+
+    context = {'files': files}
+    return render(request, 'thesis/midterm_entries.html', context)
+
+def serve_midterm_file(request, filename):
+    midterm_dir = os.path.join(settings.BASE_DIR, 'Documents', 'Midterm')
+    file_path = os.path.join(midterm_dir, filename)
+
+    if os.path.exists(file_path):
+        try:
+            output = pypandoc.convert_file(file_path, 'html')
+            context = {'html': output}
+            return render(request, 'thesis/view_document.html', context)
+        except Exception as e:
+            raise Http404(f"Error converting file: {e}")
+    else:
+        raise Http404("File does not exist")
+
+def list_final_files(request):
+    final_dir = os.path.join(settings.BASE_DIR, 'Documents', 'Final')
+    try:
+        if os.path.exists(final_dir):
+            files = [f for f in os.listdir(final_dir) if os.path.isfile(os.path.join(final_dir, f))]
+        else:
+            files = []
+    except Exception as e:
+        files = []
+
+    context = {'files': files}
+    return render(request, 'thesis/final_entries.html', context)
+
+def serve_final_file(request, filename):
+    final_dir = os.path.join(settings.BASE_DIR, 'Documents', 'Final')
+    file_path = os.path.join(final_dir, filename)
+
+    if os.path.exists(file_path):
+        try:
+            output = pypandoc.convert_file(file_path, 'html')
+            context = {'html': output}
+            return render(request, 'thesis/view_document.html', context)
+        except Exception as e:
+            raise Http404(f"Error converting file: {e}")
+    else:
+        raise Http404("File does not exist")
+
 
 
 def proposalNotice(request):
+    print("Hello from Proposal Notice")
     if request.method == 'POST':
-        form = NoticeForm(request.POST)
+        form = NoticeForm(request.POST, request.FILES)
         formExtra = NoticeFormExtra(request.POST)
         
         if form.is_valid() and formExtra.is_valid():
             try:
-                # Use filter and first() to safely get the first matching coordinator or None
                 admins = Coordinator.objects.filter(user=request.user.id).first()
                 
                 if not admins:
-                    # Handle case where no coordinator is found
                     messages.error(request, "No coordinator found for the current user.")
-                    return redirect('thesis:invalid')  # Or render a specific error page
+                    return redirect('thesis:invalid')
                 
                 form.save()
                 Common = CommonFields.objects.all()
@@ -161,24 +201,29 @@ def proposalNotice(request):
                 context['submissionTime'] = contextFormExtra['submissionTime']
                 context['submissionDate'] = contextFormExtra['submissionDate']
                 
-                src_add = os.path.join(
-                    os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates'), 'Proposal'),
-                    'ProposalNotice.docx'
-                )
+                # Save uploaded file to templates/Proposal
+                if 'template_file' in request.FILES:
+                    uploaded_file = request.FILES['template_file']
+                    template_path = os.path.join(settings.BASE_DIR, 'templates', 'Proposal', uploaded_file.name)
+                    with open(template_path, 'wb+') as destination:
+                        for chunk in uploaded_file.chunks():
+                            destination.write(chunk)
+                else:
+                    template_path = os.path.join(
+                        settings.BASE_DIR, 'templates', 'Proposal', 'ProposalNotice.docx'
+                    )
+
                 output_path = os.path.join(
-                    os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Documents'), 'Proposal'),
+                    settings.BASE_DIR, 'Documents', 'Proposal',
                     f"ProposalNotice_{uuid.uuid4()}.docx"
                 )
-                utils.render_to_word(src_add, output_path, context)
+                render_to_word(template_path, output_path, context)
                 
-                response = HttpResponse(open(output_path, 'rb').read())
-                response['Content-Type'] = 'mimetype/submimetype'
-                response['Content-Disposition'] = 'attachment; filename=ProposalNotice.docx'
-                # messages.success(request, "The Download is starting...")
+                response = HttpResponse(open(output_path, 'rb').read(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                response['Content-Disposition'] = f'attachment; filename={os.path.basename(output_path)}'
                 return response
                 
             except Exception as e:
-                # Log the exception and redirect to an error page or show an error message
                 messages.error(request, f"An unexpected error occurred: {e}")
                 return redirect('thesis:invalid')
         else:
@@ -188,57 +233,64 @@ def proposalNotice(request):
         formExtra = NoticeFormExtra()
         return render(request, 'thesis/proposalAndFinalNotice.html', {'form': form, 'formExtra': formExtra})
 
+
 def midTermNotice(request):
     if request.method == 'POST':
-        form = NoticeForm(request.POST)
+        form = NoticeForm(request.POST, request.FILES)
+        formExtra = NoticeFormExtra(request.POST)
         
-        if form.is_valid():
+        if form.is_valid() and formExtra.is_valid():
             try:
-                # Use filter and first() to safely get the first matching coordinator or None
                 admins = Coordinator.objects.filter(user=request.user.id).first()
                 
                 if not admins:
-                    # Handle case where no coordinator is found
                     messages.error(request, "No coordinator found for the current user.")
-                    return redirect('thesis:invalid')  # Or render a specific error page
-
+                    return redirect('thesis:invalid')
+                
                 form.save()
                 Common = CommonFields.objects.all()
                 if len(Common) > 1:
                     Common[0].delete()
                 
                 context = form.cleaned_data
+                contextFormExtra = formExtra.cleaned_data
                 context['programName'] = str(admins.programName)
                 context['coordinatorName'] = str(admins.coordinatorName)
+                context['submissionTime'] = contextFormExtra['submissionTime']
+                context['submissionDate'] = contextFormExtra['submissionDate']
                 
-                src_add = os.path.join(
-                    os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates'), 'Midterm'),
-                    'MidtermNotice.docx'
-                )
+                # Save uploaded file to templates/Midterm
+                if 'template_file' in request.FILES:
+                    uploaded_file = request.FILES['template_file']
+                    template_path = os.path.join(settings.BASE_DIR, 'templates', 'Midterm', uploaded_file.name)
+                    with open(template_path, 'wb+') as destination:
+                        for chunk in uploaded_file.chunks():
+                            destination.write(chunk)
+                else:
+                    template_path = os.path.join(
+                        settings.BASE_DIR, 'templates', 'Midterm', 'MidtermNotice.docx'
+                    )
+
                 output_path = os.path.join(
-                    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Documents'),
-                    'Midterm', 'midtermNotice.docx'
+                    settings.BASE_DIR, 'Documents', 'Midterm',
+                    f"MidtermNotice_{uuid.uuid4()}.docx"
                 )
+                render_to_word(template_path, output_path, context)
                 
-                utils.render_to_word(src_add, output_path, context)
-                response = HttpResponse(open(output_path, 'rb').read())
-                response['Content-Type'] = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                response['Content-Disposition'] = 'attachment; filename=midtermNotice.docx'
-                
+                response = HttpResponse(open(output_path, 'rb').read(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                response['Content-Disposition'] = f'attachment; filename={os.path.basename(output_path)}'
                 return response
                 
             except Exception as e:
-                # Log the exception and handle the error
                 messages.error(request, f"An unexpected error occurred: {e}")
                 return redirect('thesis:invalid')
         else:
-            # Handle form errors
-            messages.error(request, "Form validation failed. Please correct the errors and try again.")
-            return render(request, 'thesis/midTermNotice.html', {'form': form})
-
+            return redirect('thesis:invalid')
     else:
         form = NoticeForm()
-        return render(request, 'thesis/midTermNotice.html', {'form': form})
+        formExtra = NoticeFormExtra()
+        return render(request, 'thesis/midTermNotice.html', {'form': form, 'formExtra': formExtra})
+
 
 def finalNotice(request):
     if request.method == 'POST':
@@ -447,9 +499,9 @@ def midtermthesislist(request):
 
             k = 0
             for name in committeeMembers:
-                if k is 0:
+                if k == 0:
                     post = 'Supervisor Member Secretary'
-                elif k is 1:
+                elif k == 1:
                     post = 'Supervisor Member'
                 else:
                     post = 'Supervisor Chairman'
@@ -716,9 +768,9 @@ def finalthesislist(request):
 
             k = 0
             for name in committeeMembers:
-                if k is 0:
+                if k == 0:
                     post = 'Supervisor Member Secretary'
-                elif k is 1:
+                elif k == 1:
                     post = 'Supervisor Member'
                 else:
                     post = 'Supervisor Chairman'

@@ -9,4 +9,16 @@
         Create Proposal Defense Notice
     </a>
 
+    <h2>Downloaded Proposal Files</h2>
+    <ul>
+        {% for file in files %}
+            <li>
+                <a href="{% url 'thesis:serve_proposal_file' file %}" download>
+                    {{ file }}
+                </a>
+            </li>
+        {% empty %}
+            <li>No files found.</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

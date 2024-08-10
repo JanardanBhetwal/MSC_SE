@@ -12,4 +12,17 @@
     <a href="{% url 'thesis:mid_term_thesis_defense_list' %}" class="push_button blue">
         Prepare Midterm Thesis Defense List
     </a>
+
+    <h2>Downloaded Midterm Files</h2>
+    <ul>
+        {% for file in files %}
+            <li>
+                <a href="{% url 'thesis:serve_midterm_file' file %}">
+                    {{ file }}
+                </a>
+            </li>
+        {% empty %}
+            <li>No files found.</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

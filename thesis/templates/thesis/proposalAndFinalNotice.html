@@ -2,10 +2,7 @@
 {% load static %}
 
 {% block script %}
-
     <script src="{% static 'js/notice.js' %}"></script>
-
-
 {% endblock %}
 
 {% block body %}
@@ -13,64 +10,65 @@
     <br>
     <br>
 
-    <form class="form-horizontal" , method='POST' , action="">
+    <form class="form-horizontal" method="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
         <fieldset>
             <!-- Form Name -->
             <h2 style="text-align: center; color: #1b6d85"> Add Notice Information</h2><br>
             <!-- Text input-->
             <div class="form-group">
-                <label style="color: #3c763d" class="col-md-4 control-label" for="giftID">Notice Date</label>
+                <label style="color: #3c763d" class="col-md-4 control-label" for="noticeDate">Notice Date</label>
                 <div class="col-md-4">
                     {{ form.CurrentDate }}
                 </div>
             </div>
             <!-- Text input-->
             <div class="form-group">
-                <label style="color: #3c763d" class="col-md-4 control-label" for="giftName">Defence Date</label>
+                <label style="color: #3c763d" class="col-md-4 control-label" for="defenseDate">Defense Date</label>
                 <div class="col-md-4">
                     {{ form.defenseDate }}
                 </div>
             </div>
             <div class="form-group">
-                <label style="color: #3c763d" class="col-md-4 control-label" for="giftName">Student Batch</label>
+                <label style="color: #3c763d" class="col-md-4 control-label" for="studentBatch">Student Batch</label>
                 <div class="col-md-4">
                     {{ form.studentBatch }}
                 </div>
             </div>
-
             <!-- Select Basic -->
             <div class="form-group">
-                <label style="color: #3c763d" class="col-md-4 control-label" for="giftName">Presentation Time</label>
+                <label style="color: #3c763d" class="col-md-4 control-label" for="presentationTime">Presentation Time</label>
                 <div class="col-md-4">
                     {{ form.PresentationTime }}
                 </div>
             </div>
-
             <!-- Text input-->
             <div class="form-group">
-                <label style="color: #3c763d" class="col-md-4 control-label" for="giftID">Defence Time</label>
+                <label style="color: #3c763d" class="col-md-4 control-label" for="defenseTime">Defense Time</label>
                 <div class="col-md-4">
                     {{ form.defenseTime }}
                 </div>
             </div>
-
             <div class="form-group">
-                <label style="color: #3c763d" class="col-md-4 control-label" for="giftID">Documents Submission Time</label>
+                <label style="color: #3c763d" class="col-md-4 control-label" for="submissionTime">Documents Submission Time</label>
                 <div class="col-md-4">
                     {{ formExtra.submissionTime }}
                 </div>
             </div>
-
             <div class="form-group">
-                <label style="color: #3c763d" class="col-md-4 control-label" for="giftID">Documents Submission Date</label>
+                <label style="color: #3c763d" class="col-md-4 control-label" for="submissionDate">Documents Submission Date</label>
                 <div class="col-md-4">
                     {{ formExtra.submissionDate }}
                 </div>
             </div>
-            <br>
+            <!-- File input-->
+            <div class="form-group">
+                <label style="color: #3c763d" class="col-md-4 control-label" for="template_file">Upload Template</label>
+                <div class="col-md-4">
+                    <input type="file" name="template_file" class="form-control-file" id="template_file">
+                </div>
+            </div>
             <button id="submit" style="margin-left:45%;" class="btn btn-primary btn-lg">Submit</button>
         </fieldset>
     </form>
-
 {% endblock %}

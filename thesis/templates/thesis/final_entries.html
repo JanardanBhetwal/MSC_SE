@@ -13,7 +13,20 @@
         Prepare Final Thesis Defense List
     </a>
 
-     <a href="{% url 'thesis:results' %}" class="push_button blue">
+    <a href="{% url 'thesis:results' %}" class="push_button blue">
         Final Evaluation Letter
     </a>
+
+    <h2>Downloaded Final Files</h2>
+    <ul>
+        {% for file in files %}
+            <li>
+                <a href="{% url 'thesis:serve_final_file' file %}">
+                    {{ file }}
+                </a>
+            </li>
+        {% empty %}
+            <li>No files found.</li>
+        {% endfor %}
+    </ul>
 {% endblock %}
