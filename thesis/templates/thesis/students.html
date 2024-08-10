@@ -1,43 +1,42 @@
+
 {% extends 'thesis/base.html' %}
 
 {% load static %}
 
-
-
 {% block body %}
 
-    <form class="form-horizontal" method='POST' , action="">
-        {% csrf_token %}
-        <fieldset>
-            <!-- Form Name -->
-            {#            Inputs#}
-            <h2 style="text-align: center; color: #1b6d85"><strong>Student List</strong></h2>
-            <div class="col-lg-11">
-                <table style="margin-left: 5%" class="table table-bordered table-hover table-sm">
-                    <thead >
+<form class="form-horizontal" method="POST">
+    {% csrf_token %}
+    <fieldset>
+        <!-- Form Name -->
+        <h2 style="text-align: center; color: #1b6d85"><strong>Student List</strong></h2>
+        <div class="col-lg-11">
+            <table style="margin-left: 5%" class="table table-bordered table-hover table-sm">
+                <thead>
                     <tr>
-                        {#                        <th id='column-header-1'>Column Header 1<div id='column-header-1-sizer'></div></th>#}
                         <th style="width: 3%" scope="col" id='column-header-1'>S.N.</th>
-                        <th style="width: 12%"scope="col">Name</th>
-                        <th style="width: 11%"scope="col">Roll Number</th>
+                        <th style="width: 3%" scope="col">Select</th>
+                        <th style="width: 12%" scope="col">Name</th>
+                        <th style="width: 11%" scope="col">Roll Number</th>
                         <th scope="col" style="width: 8%">Exam Roll</th>
                         <th style="width: 20%" scope="col">Thesis Title</th>
                         <th scope="col">Supervisor</th>
                         <th scope="col">Examiner</th>
-                        <th style="width: 3%"scope="col">Mid Term</th>
-                        <th style="width: 3%"scope="col">Final</th>
+                        <th style="width: 3%" scope="col">Mid Term</th>
+                        <th style="width: 3%" scope="col">Final</th>
                         <th scope="col">Internal Marks</th>
                         <th scope="col">Final Marks</th>
                         <th scope="col">Total Marks</th>
-
-                        <th style="width: 0%"scope="col"></th>
+                        <th style="width: 0%" scope="col"></th>
                     </tr>
-                    </thead>
-                    <tbody>
-
+                </thead>
+                <tbody>
                     {% for f in formset %}
                         <tr>
                             <th scope="row"> {{ forloop.counter }} </th>
+                            <td>
+                                <input type="checkbox" name="selected_students" value="{{ f.instance.id }}">
+                            </td>
                             <td>{{ f.name }}</td>
                             <td>{{ f.rollNumber }}</td>
                             <td>{{ f.examRollNumber }}</td>
@@ -49,25 +48,16 @@
                             <td>{{ f.internalMarks }}</td>
                             <td>{{ f.finalMarks }}</td>
                             <td>{{ f.totalMarks }}</td>
-
                             <td>{{ f.id }}</td>
                         </tr>
                     {% endfor %}
-                    </tbody>
-                </table>
-
-
-            </div>
-            {{ formset.management_form }}
-            <button id="submit" type="submit" name="submit" style="margin-left:45%;" class="btn btn-primary btn-lg">Submit
-            </button>
-            </div>
-        </fieldset>
-
-    </form>
-
-    </div>
+                </tbody>
+            </table>
+        </div>
+        {{ formset.management_form }}
+        <button id="submit" type="submit" name="submit" style="margin-left:45%;" class="btn btn-primary btn-lg">Submit</button>
+        <button id="delete" type="submit" name="delete" style="margin-left:5%;" class="btn btn-danger btn-lg">Delete Selected Students</button>
+    </fieldset>
+</form>
 
 {% endblock %}
-
-

@@ -42,35 +42,41 @@ def final_entries(request):
 
 def students(request):
     if request.method == 'POST':
-        formset = StudentFormset(request.POST)
-        print(formset.errors)
-        if formset.is_valid():
-            instances = formset.save(commit=False)
-            for i in instances:
-                if i.midterm is False:
-                    i.examiner = None
-                    i.final = False
-                if not i.internalMarks and not i.finalMarks:
-                    i.totalMarks = None
-
-                if i.final is False:
-                    i.internalMarks = None
-                    i.finalMarks = None
-                    i.totalMarks = None
-                else:
-                    if i.internalMarks and i.finalMarks:
-                        i.totalMarks = i.internalMarks + i.finalMarks
-                    else:
+        if 'submit' in request.POST:
+            formset = StudentFormset(request.POST)
+            if formset.is_valid():
+                instances = formset.save(commit=False)
+                for i in instances:
+                    if i.midterm is False:
+                        i.examiner = None
+                        i.final = False
+                    if not i.internalMarks and not i.finalMarks:
                         i.totalMarks = None
-
-
-                i.save()
-        return redirect('thesis:students')
+                    if i.final is False:
+                        i.internalMarks = None
+                        i.finalMarks = None
+                        i.totalMarks = None
+                    else:
+                        if i.internalMarks and i.finalMarks:
+                            i.totalMarks = i.internalMarks + i.finalMarks
+                        else:
+                            i.totalMarks = None
+                    i.save()
+                messages.success(request, 'Students updated successfully.')
+            return redirect('thesis:students')
+        
+        elif 'delete' in request.POST:
+            selected_students = request.POST.getlist('selected_students')
+            if selected_students:
+                Student.objects.filter(id__in=selected_students).delete()
+                messages.success(request, 'Selected students were deleted successfully.')
+            else:
+                messages.error(request, 'No students were selected for deletion.')
+            return redirect('thesis:students')
+    
     else:
         formset = StudentFormset(queryset=Student.objects.all())
-        return render(request, 'thesis/students.html', {'formset': formset})
-    
-
+    return render(request, 'thesis/students.html', {'formset': formset})
 
 
 def list_proposal_files(request):
